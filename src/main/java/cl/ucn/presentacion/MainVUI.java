@@ -14,12 +14,8 @@ import java.util.List;
 public class MainVUI extends Application {
     Profesor profesor = new Profesor();
     Tarea tarea = new Tarea("Escribir una programa en Java");
-
-    Estudiante estudiante1 = new Estudiante("Juan");
-    Estudiante estudiante2 = new Estudiante("Pedro");
-    Estudiante estudiante3 = new Estudiante("Maria");
-    Estudiante estudiante4 = new Estudiante("Isabel");
-    Estudiante estudiante5 = new Estudiante("Matias");
+    private final List<Estudiante> estudiantes = new ArrayList<>();
+    private final List<Thread> hiloEstudiantes = new ArrayList<Thread>();
 
 
     private boolean isRunning = false;
@@ -56,14 +52,27 @@ public class MainVUI extends Application {
             profesor.asignarTarea(tarea.obtenerDescripcionTarea());
 
             for (String nombre : List.of("Juan", "Pedro", "Maria", "Isabel", "Matias")) {
-                Estudiante estudiante = new Estudiante(nombre);
-                estudiante.hacerTarea(tarea);
+                Estudiante estudiante = new Estudiante(nombre, tarea);
+                Thread thread = new Thread(estudiante);
+                estudiantes.add(estudiante);
+                hiloEstudiantes.add(thread);
+                thread.start();
             }
         }
     }
 
     private void pararEjecucion() {
 
+        isRunning = false;
+
+        // Interrumpir todos los hilos de estudiantes
+        for (Thread thread : hiloEstudiantes) {
+            thread.interrupt();
+        }
+
+        estudiantes.clear();
+        hiloEstudiantes.clear();
+        System.out.println("Ejecución detenida.");
     }
 
     public static void main(String[] args) {
